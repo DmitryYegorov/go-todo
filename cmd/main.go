@@ -18,12 +18,12 @@ func main() {
 	}
 
 	db, err := repository.NewPostgresDb(repository.Config{
-		Host:     "localhost",
-		Port:     "5432",
-		Username: "postgres",
-		Password: "postgres",
-		SSLMode:  "disable",
-		DBName:   "go-todo",
+		Host:     viper.GetString("db.host"),
+		Port:     viper.GetString("db.port"),
+		Username: viper.GetString("db.username"),
+		Password: viper.GetString("db.password"),
+		SSLMode:  viper.GetString("db.sslmode"),
+		DBName:   viper.GetString("db.dbname"),
 	})
 	if err != nil {
 		log.Fatalf("failed database initialization: %s", err.Error())
