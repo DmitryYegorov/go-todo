@@ -3,6 +3,8 @@ package main
 import (
 	"log"
 
+	_ "github.com/lib/pq"
+
 	todo "github.com/DmitryYegorov/go-todo/pkg"
 	"github.com/DmitryYegorov/go-todo/pkg/handler"
 	"github.com/DmitryYegorov/go-todo/pkg/repository"
@@ -15,7 +17,19 @@ func main() {
 		log.Fatalf("Error init config: %s", err.Error())
 	}
 
-	repos := repository.NewRepository()
+	db, err := repository.NewPostgresDb(repository.Config{
+		Host:     "localhost",
+		Port:     "5432",
+		Username: "postgres",
+		Password: "postgres",
+		SSLMode:  "disable",
+		DBName:   "go-todo",
+	})
+	if err != nil {
+		log.Fatalf("failed database initialization: %s", err.Error())
+	}
+
+	repos := repository.NewRepository(db)
 	services := service.NewService(repos)
 
 	server := new(todo.Server)
@@ -28,7 +42,6 @@ func main() {
 
 func initConfig() error {
 	viper.AddConfigPath("configs")
-	viper.SetConfigFile("config")
-
+	viper.SetConfigName("config")
 	return viper.ReadInConfig()
 }
