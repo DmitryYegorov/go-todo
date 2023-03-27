@@ -49,3 +49,12 @@ func (r *ListPostgres) GetAllByUserId(userId int) ([]todo.TodoList, error) {
 
 	return list, err
 }
+
+func (r *ListPostgres) GetListById(listId int, userId int) (todo.TodoList, error) {
+	var list todo.TodoList
+	getListByIdQuery := fmt.Sprintf("SELECT tl.id, tl.title, tl.description FROM %s AS ul LEFT JOIN %s tl ON ul.list_id = tl.id WHERE ul.user_id = $1 AND ul.list_id = $2", usersListsTable, todoListsTable)
+
+	err := r.db.Get(&list, getListByIdQuery, userId, listId)
+
+	return list, err
+}

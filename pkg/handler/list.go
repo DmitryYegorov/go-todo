@@ -4,6 +4,7 @@ import (
 	todo "github.com/DmitryYegorov/go-todo/entities"
 	"github.com/gin-gonic/gin"
 	"net/http"
+	"strconv"
 )
 
 func (h *Handler) createList(c *gin.Context) {
@@ -51,7 +52,24 @@ func (h *Handler) getAllLists(c *gin.Context) {
 }
 
 func (h *Handler) getListById(c *gin.Context) {
+	userId, ok := c.Get("userId")
+	listId, err := strconv.Atoi(c.Param("id"))
 
+	if !ok {
+		NewErrorResponse(c, http.StatusBadRequest, "Lists not found")
+		return
+	}
+
+	list, err := h.services.TodoList.GetTodoListById(listId, userId.(int))
+
+	if err != nil {
+		NewErrorResponse(c, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	c.JSON(http.StatusOK, map[string]todo.TodoList{
+		"list": list,
+	})
 }
 
 func (h *Handler) updateList(c *gin.Context) {
