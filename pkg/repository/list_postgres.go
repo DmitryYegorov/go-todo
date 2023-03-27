@@ -40,3 +40,12 @@ func (repo *ListPostgres) CreateNew(list todo.TodoList, userId int) (int, error)
 
 	return id, tx.Commit()
 }
+
+func (r *ListPostgres) GetAllByUserId(userId int) ([]todo.TodoList, error) {
+	var list []todo.TodoList
+	getUsersListsQuery := fmt.Sprintf("SELECT tl.id, tl.title, tl.description FROM %s as ul LEFT JOIN %s as tl ON ul.list_id = tl.id WHERE ul.user_id = $1", usersListsTable, todoListsTable)
+
+	err := r.db.Select(&list, getUsersListsQuery, userId)
+
+	return list, err
+}
