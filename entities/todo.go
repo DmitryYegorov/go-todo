@@ -1,5 +1,7 @@
 package todo
 
+import "errors"
+
 type TodoList struct {
 	Id          int    `json:"id" db:"id"`
 	Title       string `json:"title" biding:"required" db:"title"`
@@ -23,4 +25,17 @@ type ListItem struct {
 	Id     int
 	ListId int
 	ItemId int
+}
+
+type UpdateListInput struct {
+	Title       *string `json:"title" db:"title"`
+	Description *string `json:"description" db:"description"`
+}
+
+func (input *UpdateListInput) Validate() error {
+	if input.Title == nil && input.Description == nil {
+		return errors.New("all values are empty")
+	}
+
+	return nil
 }
