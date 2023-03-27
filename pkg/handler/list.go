@@ -77,5 +77,21 @@ func (h *Handler) updateList(c *gin.Context) {
 }
 
 func (h *Handler) deleteList(c *gin.Context) {
+	userId, ok := c.Get("userId")
+	listId, err := strconv.Atoi(c.Param("id"))
 
+	if !ok {
+		NewErrorResponse(c, http.StatusInternalServerError, "user not found")
+		return
+	}
+	if err != nil {
+		NewErrorResponse(c, http.StatusBadRequest, "incorrect listId")
+		return
+	}
+
+	err = h.services.TodoList.DeleteListById(listId, userId.(int))
+	if err != nil {
+		NewErrorResponse(c, http.StatusBadRequest, err.Error())
+		return
+	}
 }

@@ -58,3 +58,10 @@ func (r *ListPostgres) GetListById(listId int, userId int) (todo.TodoList, error
 
 	return list, err
 }
+
+func (r *ListPostgres) DeleteById(listId int) error {
+	deleteListByIdQuery := fmt.Sprintf("DELETE FROM %s WHERE id = $1", todoListsTable)
+	_, err := r.db.Exec(deleteListByIdQuery, listId)
+
+	return err
+}
