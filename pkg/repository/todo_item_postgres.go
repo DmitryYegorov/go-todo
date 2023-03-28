@@ -4,6 +4,8 @@ import (
 	"fmt"
 	todo "github.com/DmitryYegorov/go-todo/entities"
 	"github.com/jmoiron/sqlx"
+	"github.com/sirupsen/logrus"
+	"strings"
 )
 
 type TodoItemPostgres struct {
@@ -47,4 +49,40 @@ func (r *TodoItemPostgres) GetAllByListIdAndUserId(listId int, userId int) ([]to
 	}
 
 	return items, nil
+}
+
+func (r *TodoItemPostgres) UpdateListItem(itemId int, input todo.UpdateTodoItem) error {
+	var setValues = make([]string, 0)
+	var args = make([]interface{}, 0)
+	var argId = 1
+
+	if input.Title != nil {
+		setValues = append(setValues, fmt.Sprintf("title = $%d", argId))
+		args = append(args, *input.Title)
+		argId++
+	}
+	if input.Description != nil {
+		setValues = append(setValues, fmt.Sprintf("description = $%d", argId))
+		args = append(args, *input.Description)
+		argId++
+	}
+	if input.Done != nil {
+		setValues = append(setValues, fmt.Sprintf("done = $%d", argId))
+		if *input.Done {
+			args = append(args, "true")
+		} else {
+			args = append(args, "false")
+		}
+		argId++
+	}
+
+	args = append(args, itemId)
+	query := fmt.Sprintf("UPDATE %s SET %s WHERE id = $%d", todoItemsTable, strings.Join(setValues, ", "), argId)
+
+	logrus.Debugf("Update Query %s", query)
+	logrus.Debugf("Params: %v", args)
+
+	_, err := r.db.Exec(query, args...)
+
+	return err
 }

@@ -32,3 +32,7 @@ func (s *TodoItemService) GetAllItemByListId(listId int, userId int) ([]todo.Tod
 
 	return items, nil
 }
+
+func (s *TodoItemService) UpdateItem(itemId int, input todo.UpdateTodoItem) error {
+	return s.todoItemRepo.UpdateListItem(itemId, input)
+}
