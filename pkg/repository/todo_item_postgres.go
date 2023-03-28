@@ -86,3 +86,12 @@ func (r *TodoItemPostgres) UpdateListItem(itemId int, input todo.UpdateTodoItem)
 
 	return err
 }
+
+func (r *TodoItemPostgres) GetItemById(itemId int) (todo.TodoItem, error) {
+	query := fmt.Sprintf("SELECT id, title, description, done FROM %s WHERE id = $1", todoItemsTable)
+	var item todo.TodoItem
+
+	err := r.db.Get(&item, query, itemId)
+
+	return item, err
+}
